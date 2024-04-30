@@ -37,18 +37,30 @@ exports.signin = async (req, res) => {
 
 exports.signup = async (req, res) => {
     try {
-        const { name, email, password, isAdmin } = req.body;
+        const { name, email, password, user_type } = req.body;
 
-        await prisma.users.create({
+        const userType = await prisma.user_types.findUnique({
+            where: {
+                user_type: user_type
+            }
+        });
+
+        if (!userType) {
+            return res.status(404).json({ msg: "User type not found" });
+        }
+
+        const newUser = await prisma.users.create({
             data: {
                 email: email,
                 name: name,
                 password: bcrypt.hashSync(password, 8),
-                isAdmin: isAdmin
+                user_type_id: userType.id
             },
-        })
+        });
 
-        return this.signin(req, res);
+        const accessToken = authenticateUtil.generateAccessToken({ id: newUser.id, name: newUser.name });
+        res.status(200).json({ name: newUser.name, token: accessToken });
+
     } catch (error) {
         res.status(401).json({ msg: error.message })
     }

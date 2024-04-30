@@ -1,27 +1,72 @@
--- CreateTable
-CREATE TABLE "Students" (
-    "id" SERIAL NOT NULL,
-    "number" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "city" TEXT NOT NULL,
-    "birthday" TEXT NOT NULL,
-
-    CONSTRAINT "Students_pkey" PRIMARY KEY ("id")
+-- Create User Type table
+CREATE TABLE user_types (
+    id SERIAL PRIMARY KEY,
+    user_type TEXT NOT NULL UNIQUE
 );
 
--- CreateTable
-CREATE TABLE "Users" (
-    "id" TEXT NOT NULL,
-    "name" VARCHAR(255) NOT NULL,
-    "email" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
-    "isAdmin" BOOLEAN NOT NULL DEFAULT false,
-
-    CONSTRAINT "Users_pkey" PRIMARY KEY ("id")
+-- Create Users table
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    photo BYTEA,
+    user_type_id INTEGER REFERENCES user_types(id)
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "Students_number_key" ON "Students"("number");
+-- Create Projects table
+CREATE TABLE projects (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    status TEXT NOT NULL
+);
 
--- CreateIndex
-CREATE UNIQUE INDEX "Users_email_key" ON "Users"("email");
+-- Create User Projects table
+CREATE TABLE user_projects (
+    id SERIAL PRIMARY KEY,
+    role VARCHAR(50) NOT NULL,
+    rating INTEGER,
+    user_id INTEGER REFERENCES users(id),
+    project_id INTEGER REFERENCES projects(id)
+);
+
+-- Create Tasks table
+CREATE TABLE tasks (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    start_date DATE NOT NULL,
+    scheduled_end_date DATE,
+    conclusion_date DATE,
+    status VARCHAR(50),
+    completion_rate DECIMAL(5, 2),
+    time_spent INTERVAL,
+    location VARCHAR(255),
+    project_id INTEGER REFERENCES projects(id)
+);
+
+-- Create User Tasks table
+CREATE TABLE user_tasks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id),
+    task_id INTEGER REFERENCES tasks(id)
+);
+
+-- Create Observations table
+CREATE TABLE observations (
+    id SERIAL PRIMARY KEY,
+    comments TEXT NOT NULL,
+    photo_url BYTEA,
+    task_id INTEGER REFERENCES tasks(id),
+    user_id INTEGER REFERENCES users(id)
+);
+
+INSERT INTO user_types (user_type)
+VALUES ('Administrator'), ('Project Manager'), ('User');
+
+INSERT INTO users (email, password, name, user_type_id)
+VALUES ('admin@example.com', 'admin', 'Admin Admin', 1);
+

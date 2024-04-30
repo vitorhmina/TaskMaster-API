@@ -7,18 +7,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Students {
-  id    Int     @id @default(autoincrement())
-  number String  @unique
-  name  String
-  city String
-  birthday String
+model observations {
+  id        Int    @id @default(autoincrement())
+  comments  String
+  photo_url Bytes?
+  task_id   Int?
+  user_id   Int?
+  tasks     tasks? @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users     users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model Users{
-  id String  @id @default(uuid())
-  name String  @db.VarChar(255)
-  email String @unique
-  password String
-  isAdmin   Boolean @default(false)
+model projects {
+  id            Int             @id @default(autoincrement())
+  name          String          @unique @db.VarChar(50)
+  description   String
+  start_date    DateTime        @db.Date
+  end_date      DateTime        @db.Date
+  status        String
+  tasks         tasks[]
+  user_projects user_projects[]
+}
+
+model tasks {
+  id                 Int                      @id @default(autoincrement())
+  name               String                   @db.VarChar(255)
+  description        String?
+  start_date         DateTime                 @db.Date
+  scheduled_end_date DateTime?                @db.Date
+  conclusion_date    DateTime?                @db.Date
+  status             String?                  @db.VarChar(50)
+  completion_rate    Decimal?                 @db.Decimal(5, 2)
+  time_spent         Unsupported("interval")?
+  location           String?                  @db.VarChar(255)
+  project_id         Int?
+  observations       observations[]
+  projects           projects?                @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_tasks         user_tasks[]
+}
+
+model user_projects {
+  id         Int       @id @default(autoincrement())
+  role       String    @db.VarChar(50)
+  rating     Int?
+  user_id    Int?
+  project_id Int?
+  projects   projects? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_tasks {
+  id      Int    @id @default(autoincrement())
+  user_id Int?
+  task_id Int?
+  tasks   tasks? @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users   users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_types {
+  id        Int     @id @default(autoincrement())
+  user_type String  @unique
+  users     users[]
+}
+
+model users {
+  id            Int             @id @default(autoincrement())
+  email         String          @unique
+  password      String
+  name          String          @db.VarChar(100)
+  photo         Bytes?
+  user_type_id  Int?
+  observations  observations[]
+  user_projects user_projects[]
+  user_tasks    user_tasks[]
+  user_types    user_types?     @relation(fields: [user_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
