@@ -14,6 +14,8 @@ module.exports = async (req, res, next) => {
         const result = await authenticateUtil.certifyAccessToken(bearerToken);
         req.body.loggedUserName = result.Name;
 
+        req.user = result;
+
         return next();
     } catch (err) {
         return res.status(401).send("unauthorized");

@@ -48,25 +48,38 @@ exports.create = async (req, res) => {
 
 // Method to update a project
 exports.update = async (req, res) => {
-    const id = parseInt(req.params.id);
+    const projectId = parseInt(req.params.id);
     const { name, description, start_date, end_date } = req.body;
 
     try {
-        const updatedProject = await prisma.projects.update({
+        // Check if the project exists
+        const existingProject = await prisma.projects.findUnique({
             where: {
-                id: id,
-            },
-            data: {
-                name: name,
-                description: description,
-                start_date: start_date,
-                end_date: end_date,
+                id: projectId,
             },
         });
 
+        if (!existingProject) {
+            return res.status(404).json({ msg: 'Project not found' });
+        }
+
+        // Update the project
+        const updatedProject = await prisma.projects.update({
+            where: {
+                id: projectId,
+            },
+            data: {
+                name: name || existingProject.name,
+                description: description || existingProject.description,
+                start_date: start_date || existingProject.start_date,
+                end_date: end_date || existingProject.end_date,
+            },
+        });
+
+        // Send success response
         res.status(200).json(updatedProject);
     } catch (error) {
-        res.status(400).json({ msg: error.message });
+        res.status(400).json({ msg: error.message })
     }
 };
 

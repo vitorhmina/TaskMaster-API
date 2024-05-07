@@ -29,19 +29,16 @@ model projects {
 }
 
 model tasks {
-  id                 Int                      @id @default(autoincrement())
-  name               String                   @db.VarChar(255)
+  id                 Int            @id @default(autoincrement())
+  name               String         @db.VarChar(255)
   description        String?
-  start_date         DateTime                 @db.Date
-  scheduled_end_date DateTime?                @db.Date
-  conclusion_date    DateTime?                @db.Date
-  status             String?                  @db.VarChar(50)
-  completion_rate    Decimal?                 @db.Decimal(5, 2)
-  time_spent         Unsupported("interval")?
-  location           String?                  @db.VarChar(255)
+  start_date         DateTime       @db.Date
+  scheduled_end_date DateTime?      @db.Date
+  conclusion_date    DateTime?      @db.Date
+  status             String?        @db.VarChar(50)
   project_id         Int?
   observations       observations[]
-  projects           projects?                @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  projects           projects?      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   user_tasks         user_tasks[]
 }
 
@@ -56,11 +53,15 @@ model user_projects {
 }
 
 model user_tasks {
-  id      Int    @id @default(autoincrement())
-  user_id Int?
-  task_id Int?
-  tasks   tasks? @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users   users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id              Int      @id @default(autoincrement())
+  date            DateTime @db.Date
+  location        String   @db.VarChar(255)
+  completion_rate Decimal  @db.Decimal(5, 2)
+  time_spent      DateTime @db.Date
+  user_id         Int?
+  task_id         Int?
+  tasks           tasks?   @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model user_types {

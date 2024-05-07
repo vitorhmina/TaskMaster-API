@@ -42,15 +42,16 @@ CREATE TABLE tasks (
     scheduled_end_date DATE,
     conclusion_date DATE,
     status VARCHAR(50),
-    completion_rate DECIMAL(5, 2),
-    time_spent INTERVAL,
-    location VARCHAR(255),
     project_id INTEGER REFERENCES projects(id)
 );
 
 -- Create User Tasks table
 CREATE TABLE user_tasks (
     id SERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    completion_rate DECIMAL(5, 2) NOT NULL,
+    time_spent DATE NOT NULL,
     user_id INTEGER REFERENCES users(id),
     task_id INTEGER REFERENCES tasks(id)
 );
@@ -68,5 +69,5 @@ INSERT INTO user_types (user_type)
 VALUES ('Administrator'), ('Project Manager'), ('User');
 
 INSERT INTO users (email, password, name, user_type_id)
-VALUES ('admin@example.com', 'admin', 'Admin Admin', 1);
+VALUES ('admin@example.com', '$2a$08$Na8Jeugw5/qN0PlzTqg4U.U.DTPlyGO2IUJ8klFA9N.U80yGqpCJO', 'Admin Admin', 1);
 
