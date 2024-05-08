@@ -100,7 +100,7 @@ VALUES
   ('2024-05-05', 'Location for User Task 2', 60.0, 8.5, 3, 2),
   ('2024-05-10', 'Location for User Task 3', 100.0, 12.0, 4, 3);
 
-INSERT INTO observations (comments, photo_url, task_id, user_id)
+INSERT INTO observations (comments, photo, task_id, user_id)
 VALUES 
   ('Observation for Task 1', NULL, 1, 3),
   ('Observation for Task 2', NULL, 2, 3),
