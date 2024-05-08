@@ -61,7 +61,7 @@ CREATE TABLE user_tasks (
 CREATE TABLE observations (
     id SERIAL PRIMARY KEY,
     comments TEXT NOT NULL,
-    photo_url BYTEA,
+    photo BYTEA,
     task_id INTEGER REFERENCES tasks(id),
     user_id INTEGER REFERENCES users(id)
 );
