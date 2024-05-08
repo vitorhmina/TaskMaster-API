@@ -5,7 +5,8 @@ const prisma = new PrismaClient();
 const isManagerToProject = async (req, res, next) => {
     try {
         const userId = req.user.id;
-        const projectId = req.params.projectId;
+        const projectId = req.body.projectId;
+        console.log(projectId);
 
         // Check if the user is a project manager
         const user = await prisma.users.findUnique({

@@ -1,0 +1,167 @@
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
+// Method to retrieve all users associated with a task
+exports.getUsersByTaskId = async (req, res) => {
+    const taskId = parseInt(req.params.id);
+    try {
+        const userTasks = await prisma.user_tasks.findMany({
+            where: {
+                task_id: taskId,
+            },
+            include: {
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true,
+                        photo: true,
+                        user_type_id: true,
+                        user_tasks: {
+                            select: {
+                                date: true,
+                                location: true,
+                                completion_rate: true,
+                                time_spent: true,
+                            }
+                        }
+                    }
+                }
+            },
+        });
+
+        const users = userTasks.map((userTask) => userTask.users);
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(404).json({ msg: error.message });
+    }
+};
+
+// Method to retrieve all users associated with a task
+exports.getTasksByUserId = async (req, res) => {
+    const userId = parseInt(req.params.id);
+    try {
+        const userTasks = await prisma.user_tasks.findMany({
+            where: {
+                user_id: userId,
+            },
+            include: {
+                tasks: true,
+            },
+        });
+
+        const tasks = userTasks.map((userTask) => userTask.tasks);
+        res.status(200).json(tasks);
+    } catch (error) {
+        res.status(404).json({ msg: error.message });
+    }
+};
+
+// Method to assign a user to a task
+exports.create = async (req, res) => {
+    const { email, taskId } = req.body;
+
+    try {
+        // Find the user by email to retrieve their ID
+        const user = await prisma.users.findUnique({
+            where: {
+                email: email,
+            },
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found with the provided email' });
+        }
+
+        const userId = user.id;
+
+        // Check if the user is already assigned to the task
+        const existingAssignment = await prisma.user_tasks.findFirst({
+            where: {
+                user_id: userId,
+                task_id: taskId,
+            },
+        });
+
+        if (existingAssignment) {
+            return res.status(400).json({ message: 'User is already assigned to this task' });
+        }
+
+        // Create a new user_task entry to assign the user to the task
+        const newUserTask = await prisma.user_tasks.create({
+            data: {
+                user_id: userId,
+                task_id: taskId,
+            },
+        });
+
+        res.status(201).json(newUserTask);
+    } catch (error) {
+        res.status(400).json({ msg: error.message });
+    }
+};
+
+// Method to update a user's role in a task assignment
+exports.update = async (req, res) => {
+    const assignmentId = parseInt(req.params.id);
+    const { date, location, completion_rate, time_spent } = req.body;
+
+    try {
+        // Check if the assignment exists
+        const existingAssignment = await prisma.user_tasks.findUnique({
+            where: {
+                id: assignmentId,
+            },
+        });
+
+        if (!existingAssignment) {
+            return res.status(404).json({ msg: 'Assignment not found' });
+        }
+
+        // Update the role of the assignment
+        const updatedAssignment = await prisma.user_projects.update({
+            where: {
+                id: assignmentId,
+            },
+            data: {
+                date: date || existingAssignment.date,
+                location: location || existingAssignment.location,
+                completion_rate: completion_rate || existingAssignment.completion_rate,
+                time_spent: time_spent || existingAssignment.time_spent,
+            },
+        });
+
+        res.status(200).json(updatedAssignment);
+    } catch (error) {
+        res.status(400).json({ msg: error.message });
+    }
+};
+
+// Method to unassign a user from a task
+exports.delete = async (req, res) => {
+    const assignmentId = parseInt(req.params.id);
+
+    try {
+        // Check if the assignment exists
+        const existingAssignment = await prisma.user_tasks.findUnique({
+            where: {
+                id: assignmentId,
+            },
+        });
+
+        if (!existingAssignment) {
+            return res.status(400).json({ msg: 'Assignment not found' });
+        }
+
+        // Delete the assignment entry to disassociate the user from the task
+        await prisma.user_projects.delete({
+            where: {
+                id: assignmentId,
+            },
+        });
+
+        res.status(200).json({ msg: 'User unassigned from task successfully' });
+    } catch (error) {
+        res.status(400).json({ msg: error.message });
+    }
+};

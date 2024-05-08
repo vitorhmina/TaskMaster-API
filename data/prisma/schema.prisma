@@ -57,7 +57,7 @@ model user_tasks {
   date            DateTime @db.Date
   location        String   @db.VarChar(255)
   completion_rate Decimal  @db.Decimal(5, 2)
-  time_spent      DateTime @db.Date
+  time_spent      Decimal  @db.Decimal(5, 2)
   user_id         Int?
   task_id         Int?
   tasks           tasks?   @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

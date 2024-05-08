@@ -10,8 +10,8 @@ taskRouter.use(authMiddleware);
 // Tasks CRUD
 taskRouter.get('/getProjectTasks/:id', controller.getTasksByProjectId); // get all tasks of a project
 taskRouter.get('/:id', controller.getById); // get task by id
-taskRouter.post('/create', authorizeUserTypes([1, 2]), isManagerToProject, controller.create); // create a new task
-taskRouter.put('/update/:id', authorizeUserTypes([1, 2]), isManagerToProject, controller.update); // update a task
-taskRouter.delete('/delete/:id', authorizeUserTypes([1, 2]), isManagerToProject, controller.delete); // delete a task
+taskRouter.post('/create', isManagerToProject, controller.create); // create a new task
+taskRouter.put('/update/:id', isManagerToProject, controller.update); // update a task
+taskRouter.delete('/delete/:id', isManagerToProject, controller.delete); // delete a task
 
 module.exports = taskRouter;
