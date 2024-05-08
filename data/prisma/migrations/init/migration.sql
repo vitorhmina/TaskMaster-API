@@ -104,5 +104,3 @@ VALUES
   ('Observation for Task 1', NULL, 1, 3),
   ('Observation for Task 2', NULL, 2, 3),
   ('Observation for Task 3', NULL, 3, 4);
-
-
