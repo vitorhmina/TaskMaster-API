@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // Method to retrieve all users associated with a task
-exports.getUsersByTaskId = async (req, res) => {
+exports.getTaskUsers = async (req, res) => {
     const taskId = parseInt(req.params.id);
     try {
         const userTasks = await prisma.user_tasks.findMany({
@@ -16,8 +16,15 @@ exports.getUsersByTaskId = async (req, res) => {
                         name: true,
                         email: true,
                         photo: true,
-                        user_type_id: true,
+                        user_types: {
+                            select: {
+                                user_type: true,
+                            }
+                        },
                         user_tasks: {
+                            where: {
+                                task_id: taskId
+                            },
                             select: {
                                 date: true,
                                 location: true,
@@ -38,7 +45,7 @@ exports.getUsersByTaskId = async (req, res) => {
 };
 
 // Method to retrieve all users associated with a task
-exports.getTasksByUserId = async (req, res) => {
+exports.getUserTasks = async (req, res) => {
     const userId = parseInt(req.params.id);
     try {
         const userTasks = await prisma.user_tasks.findMany({
@@ -56,6 +63,21 @@ exports.getTasksByUserId = async (req, res) => {
         res.status(404).json({ msg: error.message });
     }
 };
+
+// Method to return a user_task assignement by its id
+exports.getById = async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const response = await prisma.user_tasks.findUnique({
+            where: {
+                id: id,
+            },
+        })
+        res.status(200).json(response)
+    } catch (error) {
+        res.status(404).json({ msg: error.message })
+    }
+}
 
 // Method to assign a user to a task
 exports.create = async (req, res) => {

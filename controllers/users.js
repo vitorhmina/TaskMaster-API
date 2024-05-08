@@ -12,8 +12,8 @@ exports.getAll = async (req, res) => {
     }
 }
 
-// Method to return all users
-exports.getAllManagers = async (req, res) => {
+// Method to return all project managers
+exports.getManagers = async (req, res) => {
     try {
         const response = await prisma.users.findMany({
             where: {
@@ -74,27 +74,41 @@ exports.create = async (req, res) => {
 // Method to update a user
 exports.update = async (req, res) => {
     const id = parseInt(req.params.id);
-    const { name, email, password, user_type } = req.body;
-
-    const userType = await prisma.user_types.findUnique({
-        where: {
-            user_type: user_type
-        }
-    });
-
-    if (!userType) {
-        return res.status(404).json({ msg: "User type not found" });
-    }
+    const { name, email, password, photo, user_type } = req.body;
 
     try {
+        // Check if the user exists
+        const existingUser = await prisma.users.findUnique({
+            where: {
+                id: id,
+            },
+        });
+
+        if (!existingUser) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        // Check if the user type exists
+        const userType = await prisma.user_types.findUnique({
+            where: {
+                user_type: user_type,
+            },
+        });
+
+        if (!userType) {
+            return res.status(404).json({ msg: "User type not found" });
+        }
+
+        // Update the user
         const updatedUser = await prisma.users.update({
             where: {
                 id: id,
             },
             data: {
-                name: name,
-                email: email,
-                password: bcrypt.hashSync(password, 8),
+                name: name || existingUser.name,
+                email: email || existingUser.email,
+                password: password ? bcrypt.hashSync(password, 8) : existingUser.password,
+                photo: photo || existingUser.photo,
                 user_type_id: userType.id,
             },
         });

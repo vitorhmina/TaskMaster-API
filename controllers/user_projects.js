@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // Method to retrieve all users associated with a project
-exports.getUsersByProjectId = async (req, res) => {
+exports.getProjectUsers = async (req, res) => {
     const projectId = parseInt(req.params.id);
     try {
         const userProjects = await prisma.user_projects.findMany({
@@ -16,8 +16,15 @@ exports.getUsersByProjectId = async (req, res) => {
                         name: true,
                         email: true,
                         photo: true,
-                        user_type_id: true,
+                        user_types: {
+                            select: {
+                                user_type: true,
+                            }
+                        },
                         user_projects: {
+                            where: {
+                                project_id: projectId
+                            },
                             select: {
                                 role: true,
                                 rating: true,
@@ -31,12 +38,12 @@ exports.getUsersByProjectId = async (req, res) => {
         const users = userProjects.map((userProject) => userProject.users);
         res.status(200).json(users);
     } catch (error) {
-        res.status(404).json({ msg: error.message });
+        res.status(400).json({ msg: error.message });
     }
 };
 
 // Method to retrieve all users associated with a project
-exports.getProjectsByUserId = async (req, res) => {
+exports.getUserProjects = async (req, res) => {
     const userId = parseInt(req.params.id);
     try {
         const userProjects = await prisma.user_projects.findMany({
@@ -54,6 +61,21 @@ exports.getProjectsByUserId = async (req, res) => {
         res.status(404).json({ msg: error.message });
     }
 };
+
+// Method to return a user_project assignement by its id
+exports.getById = async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const response = await prisma.user_projects.findUnique({
+            where: {
+                id: id,
+            },
+        })
+        res.status(200).json(response)
+    } catch (error) {
+        res.status(404).json({ msg: error.message })
+    }
+}
 
 // Method to assign a user to a project
 exports.create = async (req, res) => {

@@ -20,7 +20,8 @@ CREATE TABLE projects (
     name VARCHAR(50) NOT NULL UNIQUE,
     description TEXT NOT NULL,
     start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
+    planned_end_date DATE NOT NULL,
+    actual_end_date DATE,
     status TEXT NOT NULL
 );
 
@@ -28,7 +29,7 @@ CREATE TABLE projects (
 CREATE TABLE user_projects (
     id SERIAL PRIMARY KEY,
     role VARCHAR(50) NOT NULL,
-    rating INTEGER,
+    rating DECIMAL(3, 1),
     user_id INTEGER REFERENCES users(id),
     project_id INTEGER REFERENCES projects(id)
 );
@@ -39,8 +40,8 @@ CREATE TABLE tasks (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     start_date DATE NOT NULL,
-    scheduled_end_date DATE,
-    conclusion_date DATE,
+    planned_end_date DATE NOT NULL,
+    actual_end_date DATE,
     status VARCHAR(50),
     project_id INTEGER REFERENCES projects(id)
 );
@@ -71,7 +72,7 @@ VALUES ('Administrator'), ('Project Manager'), ('User');
 INSERT INTO users (email, password, name, user_type_id)
 VALUES 
   ('admin@example.com', '$2a$08$Na8Jeugw5/qN0PlzTqg4U.U.DTPlyGO2IUJ8klFA9N.U80yGqpCJO', 'Admin Admin', 1),
-  ('manager@example.com', '$2a$08$CERlfHwdas.lj6dL8bNS0Op/sP4o0XigQ94paoKeSloOk7AS/aCJW', 'Manager manager', 2)
+  ('manager@example.com', '$2a$08$CERlfHwdas.lj6dL8bNS0Op/sP4o0XigQ94paoKeSloOk7AS/aCJW', 'Manager manager', 2),
   ('user1@example.com', '$2a$08$$2a$08$jl9.YEanVCfSRH1RwdbWdudS8FdCFAHPVACXUZMeZkOnAqHfTmjq6', 'User One', 3),
   ('user2@example.com', '$2a$08$6Htob5HxpwHThi8FfmfM.urFwsuNjrDv3yH4u1TIZmJnb6vqRjMb6', 'User Two', 3);
 

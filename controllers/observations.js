@@ -2,19 +2,15 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 // Method to retrieve all observations associated with a task
-exports.getObservationsByTaskId = async (req, res) => {
+exports.getTaskObservations = async (req, res) => {
     const taskId = parseInt(req.params.id);
     try {
         const observations = await prisma.observations.findMany({
             where: {
                 task_id: taskId,
             },
-            include: {
-                tasks: true,
-                users: true,
-            },
+            
         });
-
         res.status(200).json(observations);
     } catch (error) {
         res.status(404).json({ msg: error.message });
@@ -28,10 +24,6 @@ exports.getById = async (req, res) => {
         const observation = await prisma.observations.findUnique({
             where: {
                 id: observationId,
-            },
-            include: {
-                tasks: true,
-                users: true,
             },
         });
 
@@ -47,7 +39,7 @@ exports.getById = async (req, res) => {
 
 // Method to create a observation
 exports.create = async (req, res) => {
-    const { taskId, userId, comments, photo_url } = req.body;
+    const { taskId, userId, comments, photo } = req.body;
 
     try {
         // Check if the task exists
@@ -78,7 +70,7 @@ exports.create = async (req, res) => {
                 task_id: taskId,
                 user_id: userId,
                 comments: comments,
-                photo_url: photo_url,
+                photo: photo,
             },
         });
 
@@ -91,7 +83,7 @@ exports.create = async (req, res) => {
 // Method to update a observation
 exports.update = async (req, res) => {
     const observationId = parseInt(req.params.id);
-    const { comments, photo_url } = req.body;
+    const { comments, photo } = req.body;
 
     try {
         // Check if the observation exists
@@ -112,7 +104,7 @@ exports.update = async (req, res) => {
             },
             data: {
                 comments: comments || existingObservation.comments,
-                photo_url: photo_url || existingObservation.photo_url,
+                photo: photo || existingObservation.photo,
             },
         });
 

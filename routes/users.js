@@ -7,11 +7,9 @@ const authorizeUserTypes = require('../middlewares/authorizeUserTypes');
 userRouter.use(authMiddleware);
 
 //projects CRUD
-userRouter.get('/', controller.getAll); //read all
+userRouter.get('/', authorizeUserTypes([1]), controller.getAll); //read all
+userRouter.get('/managers', authorizeUserTypes([1]), controller.getManagers);
 userRouter.get('/:id', controller.getById); //read one by his id
-
-// Routes restricted to admin users
-userRouter.get('/managers', authorizeUserTypes([1]), controller.getAllManagers);
 userRouter.post('/create', authorizeUserTypes([1]), controller.create); // Create new user
 userRouter.put('/update/:id', authorizeUserTypes([1]), controller.update); // Update user
 userRouter.delete('/delete/:id', authorizeUserTypes([1]), controller.delete); // Delete user

@@ -63,7 +63,7 @@ exports.create = async (req, res) => {
 // Method to update a task
 exports.update = async (req, res) => {
     const taskId = parseInt(req.params.id);
-    const { name, description, start_date, scheduled_end_date, status, project_id } = req.body;
+    const { name, description, start_date, planned_end_date, actual_end_date, status, project_id } = req.body;
 
     try {
         // Check if the task exists
@@ -86,7 +86,8 @@ exports.update = async (req, res) => {
                 name: name || existingTask.name,
                 description: description || existingTask.description,
                 start_date: start_date || existingTask.start_date,
-                scheduled_end_date: scheduled_end_date || existingTask.scheduled_end_date,
+                planned_end_date: planned_end_date || existingTask.planned_end_date,
+                actual_end_date: actual_end_date || existingTask.actual_end_date,
                 status: status || existingTask.status,
                 project_id: project_id || existingTask.project_id,
             },

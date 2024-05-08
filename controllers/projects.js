@@ -28,14 +28,14 @@ exports.getById = async (req, res) => {
 
 // Method to create a project
 exports.create = async (req, res) => {
-    const { name, description, start_date, end_date } = req.body;
+    const { name, description, start_date, planned_end_date } = req.body;
     try {
         const project = await prisma.projects.create({
             data: {
                 name: name,
                 description: description,
                 start_date: start_date,
-                end_date: end_date,
+                planned_end_date: planned_end_date,
                 status: "Active"
 
             },
@@ -49,7 +49,7 @@ exports.create = async (req, res) => {
 // Method to update a project
 exports.update = async (req, res) => {
     const projectId = parseInt(req.params.id);
-    const { name, description, start_date, end_date } = req.body;
+    const { name, description, start_date, planned_end_date, actual_end_date } = req.body;
 
     try {
         // Check if the project exists
@@ -72,7 +72,8 @@ exports.update = async (req, res) => {
                 name: name || existingProject.name,
                 description: description || existingProject.description,
                 start_date: start_date || existingProject.start_date,
-                end_date: end_date || existingProject.end_date,
+                planned_end_date: planned_end_date || existingProject.planned_end_date,
+                actual_end_date: actual_end_date || existingProject.actual_end_date,
             },
         });
 

@@ -9,7 +9,7 @@ const isManagerToProject = require('../middlewares/isManagerToProject');
 observationRouter.use(authMiddleware);
 
 //projects CRUD
-observationRouter.get('/', controller.getObservationsByTaskId); // get all observations
+observationRouter.get('/getTaskObservations/:id', controller.getTaskObservations); // get all observations
 observationRouter.get('/:id', controller.getById); // get observation by id
 observationRouter.post('/create', isAssignedToTask, controller.create); // Create new observation
 observationRouter.put('/update/:id', isAssignedToTask, controller.update); // Update observation
