@@ -8,44 +8,45 @@ datasource db {
 }
 
 model observations {
-  id        Int    @id @default(autoincrement())
-  comments  String
-  photo Bytes?
-  task_id   Int?
-  user_id   Int?
-  tasks     tasks? @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users     users? @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id       Int     @id @default(autoincrement())
+  comments String
+  photo    String?
+  task_id  Int?
+  user_id  Int?
+  tasks    tasks?  @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users    users?  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model projects {
-  id            Int             @id @default(autoincrement())
-  name          String          @unique @db.VarChar(50)
-  description   String
-  start_date    DateTime        @db.Date
-  end_date      DateTime        @db.Date
-  status        String
-  tasks         tasks[]
-  user_projects user_projects[]
+  id               Int             @id @default(autoincrement())
+  name             String          @unique @db.VarChar(50)
+  description      String
+  start_date       DateTime        @db.Date
+  planned_end_date DateTime        @db.Date
+  actual_end_date  DateTime?       @db.Date
+  status           String
+  tasks            tasks[]
+  user_projects    user_projects[]
 }
 
 model tasks {
-  id                 Int            @id @default(autoincrement())
-  name               String         @db.VarChar(255)
-  description        String?
-  start_date         DateTime       @db.Date
-  scheduled_end_date DateTime?      @db.Date
-  conclusion_date    DateTime?      @db.Date
-  status             String?        @db.VarChar(50)
-  project_id         Int?
-  observations       observations[]
-  projects           projects?      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  user_tasks         user_tasks[]
+  id               Int            @id @default(autoincrement())
+  name             String         @db.VarChar(255)
+  description      String?
+  start_date       DateTime       @db.Date
+  planned_end_date DateTime       @db.Date
+  actual_end_date  DateTime?      @db.Date
+  status           String?        @db.VarChar(50)
+  project_id       Int?
+  observations     observations[]
+  projects         projects?      @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_tasks       user_tasks[]
 }
 
 model user_projects {
   id         Int       @id @default(autoincrement())
   role       String    @db.VarChar(50)
-  rating     Decimal   @db.Decimal(3, 1)
+  rating     Decimal?  @db.Decimal(3, 1)
   user_id    Int?
   project_id Int?
   projects   projects? @relation(fields: [project_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -53,15 +54,15 @@ model user_projects {
 }
 
 model user_tasks {
-  id              Int      @id @default(autoincrement())
-  date            DateTime @db.Date
-  location        String   @db.VarChar(255)
-  completion_rate Decimal  @db.Decimal(5, 2)
-  time_spent      Decimal  @db.Decimal(5, 2)
+  id              Int       @id @default(autoincrement())
+  date            DateTime? @db.Date
+  location        String?   @db.VarChar(255)
+  completion_rate Decimal?  @db.Decimal(5, 2)
+  time_spent      Decimal?  @db.Decimal(5, 2)
   user_id         Int?
   task_id         Int?
-  tasks           tasks?   @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  users           users?   @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tasks           tasks?    @relation(fields: [task_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model user_types {
@@ -75,7 +76,7 @@ model users {
   email         String          @unique
   password      String
   name          String          @db.VarChar(100)
-  photo         Bytes?
+  photo         String?
   user_type_id  Int?
   observations  observations[]
   user_projects user_projects[]

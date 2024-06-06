@@ -10,7 +10,7 @@ CREATE TABLE users (
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     name VARCHAR(100) NOT NULL,
-    photo BYTEA,
+    photo TEXT,
     user_type_id INTEGER REFERENCES user_types(id)
 );
 
@@ -61,7 +61,7 @@ CREATE TABLE user_tasks (
 CREATE TABLE observations (
     id SERIAL PRIMARY KEY,
     comments TEXT NOT NULL,
-    photo BYTEA,
+    photo TEXT,
     task_id INTEGER REFERENCES tasks(id),
     user_id INTEGER REFERENCES users(id)
 );
@@ -76,10 +76,10 @@ VALUES
   ('user1@example.com', '$2a$08$$2a$08$jl9.YEanVCfSRH1RwdbWdudS8FdCFAHPVACXUZMeZkOnAqHfTmjq6', 'User One', 3),
   ('user2@example.com', '$2a$08$6Htob5HxpwHThi8FfmfM.urFwsuNjrDv3yH4u1TIZmJnb6vqRjMb6', 'User Two', 3);
 
-INSERT INTO projects (name, description, start_date, end_date, status)
+INSERT INTO projects (name, description, start_date, planned_end_date, actual_end_date, status)
 VALUES 
-  ('Project 1', 'Description for Project 1', '2024-04-30', '2024-06-30', 'Active'),
-  ('Project 2', 'Description for Project 2', '2024-05-01', '2024-07-01', 'Inactive');
+  ('Project 1', 'Description for Project 1', '2024-04-30', '2024-06-30', NULL, 'Active'),
+  ('Project 2', 'Description for Project 2', '2024-05-01', '2024-07-01', NULL, 'Inactive');
 
 INSERT INTO user_projects (role, rating, user_id, project_id)
 VALUES 
@@ -88,11 +88,11 @@ VALUES
   ('Fullstack Developer', NULL, 3, 2),
   ('Frontend Developer', NULL, 4, 1);
 
-INSERT INTO tasks (name, description, start_date, scheduled_end_date, conclusion_date, status, project_id)
+INSERT INTO tasks (name, description, start_date, planned_end_date, actual_end_date, status, project_id)
 VALUES 
   ('Task 1', 'Description for Task 1', '2024-05-01', '2024-05-15', NULL, 'In Progress', 1),
-  ('Task 2', 'Description for Task 2', '2024-05-05', '2024-05-20', NULL, 'Pending', 1),
-  ('Task 3', 'Description for Task 3', '2024-05-10', '2024-05-25', NULL, 'Completed', 2);
+  ('Task 2', 'Description for Task 2', '2024-05-05', '2024-05-20', '2024-05-22', 'Pending', 1),
+  ('Task 3', 'Description for Task 3', '2024-05-10', '2024-05-25', '2024-05-25', 'Completed', 2);
 
   INSERT INTO user_tasks (date, location, completion_rate, time_spent, user_id, task_id)
 VALUES 
