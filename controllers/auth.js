@@ -37,24 +37,14 @@ exports.signin = async (req, res) => {
 
 exports.signup = async (req, res) => {
     try {
-        const { name, email, password, user_type } = req.body;
-
-        const userType = await prisma.user_types.findUnique({
-            where: {
-                user_type: user_type
-            }
-        });
-
-        if (!userType) {
-            return res.status(404).json({ msg: "User type not found" });
-        }
+        const { name, email, password } = req.body;
 
         const newUser = await prisma.users.create({
             data: {
                 email: email,
                 name: name,
                 password: bcrypt.hashSync(password, 8),
-                user_type_id: userType.id
+                user_type_id: 3
             },
         });
 
