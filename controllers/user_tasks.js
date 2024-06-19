@@ -44,9 +44,9 @@ exports.getTaskUsers = async (req, res) => {
     }
 };
 
-// Method to retrieve all users associated with a task
+// Method to retrieve all tasks associated with a user
 exports.getUserTasks = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    const userId = parseInt(req.user.id);
     try {
         const userTasks = await prisma.user_tasks.findMany({
             where: {

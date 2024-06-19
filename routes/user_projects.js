@@ -9,7 +9,7 @@ userProjectsRouter.use(authMiddleware);
 
 //projects CRUD
 userProjectsRouter.get('/getProjectUsers/:id', controller.getProjectUsers); // get all users assigned to a project
-userProjectsRouter.get('/getUserProjects/:id', controller.getUserProjects); // get all projects a user is assigned to
+userProjectsRouter.get('/getUserProjects', controller.getUserProjects); // get all projects a user is assigned to
 userProjectsRouter.get('/:id', controller.getById); // get a user assignement to a project by id
 userProjectsRouter.post('/create', isManagerToProject , controller.create); // assign a user to a project
 userProjectsRouter.put('/update/:id', isManagerToProject, controller.update); // update a user project assignement

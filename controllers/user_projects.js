@@ -44,23 +44,39 @@ exports.getProjectUsers = async (req, res) => {
 
 // Method to retrieve all users associated with a project
 exports.getUserProjects = async (req, res) => {
-    const userId = parseInt(req.params.id);
+    const userId = parseInt(req.user.id);
     try {
         const userProjects = await prisma.user_projects.findMany({
             where: {
                 user_id: userId,
             },
             include: {
-                projects: true,
+                projects: {
+                    include: {
+                        tasks: true,  // Include tasks to calculate counts
+                    },
+                },
             },
         });
 
-        const projects = userProjects.map((userProject) => userProject.projects);
+        const projects = userProjects.map((userProject) => {
+            const project = userProject.projects;
+            const totalTasks = project.tasks.length;
+            const completedTasks = project.tasks.filter(task => task.status === 'Completed').length;
+
+            return {
+                ...project,
+                totalTasks: totalTasks,
+                completedTasks: completedTasks,
+            };
+        });
+
         res.status(200).json(projects);
     } catch (error) {
         res.status(404).json({ msg: error.message });
     }
 };
+
 
 // Method to return a user_project assignement by its id
 exports.getById = async (req, res) => {
