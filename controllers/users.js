@@ -5,12 +5,31 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 // Method to return all users
 exports.getAll = async (req, res) => {
     try {
-        const response = await prisma.users.findMany();
-        res.status(200).json(response)
+        const response = await prisma.users.findMany({
+            include: {
+                user_types: {
+                    select: {
+                        user_type: true
+                    }
+                }
+            }
+        });
+
+        const transformedResponse = response.map(user => ({
+            id: user.id,
+            email: user.email,
+            password: user.password,
+            name: user.name,
+            photo: user.photo,
+            user_type: user.user_types.user_type
+        }));
+
+        res.status(200).json(transformedResponse);
     } catch (error) {
-        res.status(500).json({ msg: error.message })
+        res.status(500).json({ msg: error.message });
     }
 }
+
 
 // Method to return all project managers
 exports.getManagers = async (req, res) => {
