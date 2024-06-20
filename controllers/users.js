@@ -138,16 +138,27 @@ exports.update = async (req, res) => {
     }
 };
 
-// Method to delete a user
 exports.delete = async (req, res) => {
     const id = parseInt(req.params.id);
 
     try {
-        await prisma.users.delete({
-            where: {
-                id: id,
-            },
-        });
+        await prisma.$transaction([
+            prisma.user_projects.deleteMany({
+                where: {
+                    user_id: id,
+                },
+            }),
+            prisma.user_tasks.deleteMany({
+                where: {
+                    user_id: id,
+                },
+            }),
+            prisma.users.delete({
+                where: {
+                    id: id,
+                },
+            }),
+        ]);
 
         res.status(200).send("User deleted successfully");
     } catch (error) {
