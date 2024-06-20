@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs/dist/bcrypt');
 const authenticateUtil = require('../utils/authenticate.js');
 
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
 exports.signin = async (req, res) => {
     try {
@@ -12,27 +12,44 @@ exports.signin = async (req, res) => {
             where: {
                 email: email,
             },
-        })
+            include: {
+                user_types: {
+                    select: {
+                        user_type: true
+                    }
+                }
+            }
+        });
 
         if (user) {
-            var passwordIsValid = bcrypt.compareSync(
-                password,
-                user.password
-            );
+            var passwordIsValid = bcrypt.compareSync(password, user.password);
 
             if (passwordIsValid) {
-                const accessToken = authenticateUtil.generateAccessToken({ id: user.id, name: user.name, user_type_id: user.user_type_id });
-                res.status(200).json({ name: user.name, token: accessToken });
+                const accessToken = authenticateUtil.generateAccessToken({
+                    id: user.id,
+                    name: user.name,
+                    user_type_id: user.user_type_id
+                });
+
+                res.status(200).json({
+                    name: user.name,
+                    token: accessToken,
+                    userId: user.id,
+                    user_type: user.user_types.user_type
+                });
                 return;
             }
         }
 
-        res.status(401).json({ msg: "invalid_login" });
+        res.status(401).json({ msg: "Invalid login credentials" });
 
     } catch (error) {
-        res.status(401).json({ msg: error.message })
+        res.status(500).json({ msg: error.message });
+    } finally {
+        await prisma.$disconnect();
     }
-}
+};
+
 
 
 exports.signup = async (req, res) => {
