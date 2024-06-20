@@ -153,6 +153,11 @@ exports.delete = async (req, res) => {
                     user_id: id,
                 },
             }),
+            prisma.observations.deleteMany({
+                where: {
+                    user_id: id,
+                },
+            }),
             prisma.users.delete({
                 where: {
                     id: id,
