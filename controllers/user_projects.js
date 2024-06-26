@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Method to retrieve all users associated with a project
+// Method to retrieve all user projects associated with a project
 exports.getProjectUsers = async (req, res) => {
     const projectId = parseInt(req.params.id);
     try {
@@ -13,25 +13,37 @@ exports.getProjectUsers = async (req, res) => {
                 users: {
                     select: {
                         name: true,
+                        user_projects: {
+                            select: {
+                                id: true,
+                                role: true,
+                                rating: true,
+                            }
+                        }
                     }
                 }
             },
         });
 
-        // Modify user_projects part to include the associated user's name
-        const modifiedUserProjects = userProjects.map((userProject) => {
+        // Extract user_projects and include the associated user's name
+        const userProjectsList = userProjects.flatMap((userProject) => {
             const { users } = userProject;
-            return users.user_projects.map((up) => ({
-                ...up,
-                user_name: users.name  // Include the associated user's name
-            }));
-        }).flat(); // Flatten the array since we are mapping over nested arrays
 
-        res.status(200).json(modifiedUserProjects);
+            return users.user_projects.map((up) => ({
+                id: up.id,
+                role: up.role,
+                rating: up.rating,
+                name: users.name
+            }));
+        });
+
+        res.status(200).json(userProjectsList);
     } catch (error) {
-        res.status(400).json({ msg: error.message });
+        console.error("Error fetching user projects:", error);
+        res.status(500).json({ msg: "Internal server error" });
     }
 };
+
 
 // Method to retrieve all users associated with a project
 exports.getUserProjects = async (req, res) => {
