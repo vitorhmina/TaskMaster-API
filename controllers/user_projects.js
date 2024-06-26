@@ -12,43 +12,22 @@ exports.getProjectUsers = async (req, res) => {
             include: {
                 users: {
                     select: {
-                        id: true,
                         name: true,
-                        email: true,
-                        photo: true,
-                        user_types: {
-                            select: {
-                                user_type: true,
-                            }
-                        },
-                        user_projects: {
-                            where: {
-                                project_id: projectId
-                            },
-                            select: {
-                                role: true,
-                                rating: true,
-                            }
-                        }
                     }
                 }
             },
         });
 
-        // Modify response to include user projects and user names
-        const usersWithProjects = userProjects.map((userProject) => {
+        // Modify user_projects part to include the associated user's name
+        const modifiedUserProjects = userProjects.map((userProject) => {
             const { users } = userProject;
-            return {
-                ...users,
-                user_projects: users.user_projects.map((up) => ({
-                    role: up.role,
-                    rating: up.rating,
-                    name: users.name
-                })),
-            };
-        });
+            return users.user_projects.map((up) => ({
+                ...up,
+                user_name: users.name  // Include the associated user's name
+            }));
+        }).flat(); // Flatten the array since we are mapping over nested arrays
 
-        res.status(200).json(usersWithProjects);
+        res.status(200).json(modifiedUserProjects);
     } catch (error) {
         res.status(400).json({ msg: error.message });
     }
