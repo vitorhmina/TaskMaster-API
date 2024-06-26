@@ -39,7 +39,7 @@ exports.getById = async (req, res) => {
 exports.create = async (req, res) => {
     try {
         // Extract task data from request body
-        const { name, description, start_date, scheduled_end_date, status, project_id } = req.body;
+        const { name, description, start_date, planned_end_date, status, project_id } = req.body;
 
         // Create the task using Prisma
         const createdTask = await prisma.tasks.create({
@@ -47,7 +47,7 @@ exports.create = async (req, res) => {
                 name,
                 description,
                 start_date,
-                scheduled_end_date,
+                planned_end_date,
                 status,
                 project_id
             },
