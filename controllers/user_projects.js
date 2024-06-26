@@ -80,8 +80,7 @@ exports.getUserProjects = async (req, res) => {
     }
 };
 
-
-// Method to return a user_project assignement by its id
+// Method to return a user_project assignment by its id
 exports.getById = async (req, res) => {
     const id = parseInt(req.params.id);
     try {
@@ -89,12 +88,29 @@ exports.getById = async (req, res) => {
             where: {
                 id: id,
             },
-        })
-        res.status(200).json(response)
+            include: {
+                users: true,
+            },
+        });
+
+        if (!response) {
+            return res.status(404).json({ msg: "User project not found" });
+        }
+
+        const result = {
+            id: response.id,
+            role: response.role,
+            rating: response.rating,
+            user_id: response.user_id,
+            project_id: response.project_id,
+            email: response.users.email,
+        };
+
+        res.status(200).json(result);
     } catch (error) {
-        res.status(404).json({ msg: error.message })
+        res.status(404).json({ msg: error.message });
     }
-}
+};
 
 // Method to assign a user to a project
 exports.create = async (req, res) => {
