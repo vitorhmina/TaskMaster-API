@@ -35,8 +35,20 @@ exports.getProjectUsers = async (req, res) => {
             },
         });
 
-        const users = userProjects.map((userProject) => userProject.users);
-        res.status(200).json(users);
+        // Modify response to include user projects and user names
+        const usersWithProjects = userProjects.map((userProject) => {
+            const { users } = userProject;
+            return {
+                ...users,
+                user_projects: users.user_projects.map((up) => ({
+                    role: up.role,
+                    rating: up.rating,
+                    name: users.name
+                })),
+            };
+        });
+
+        res.status(200).json(usersWithProjects);
     } catch (error) {
         res.status(400).json({ msg: error.message });
     }
