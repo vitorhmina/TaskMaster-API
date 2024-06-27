@@ -49,7 +49,7 @@ exports.create = async (req, res) => {
 // Method to update a project
 exports.update = async (req, res) => {
     const projectId = parseInt(req.params.id);
-    const { name, description, start_date, planned_end_date, actual_end_date } = req.body;
+    const { name, description, start_date, planned_end_date, actual_end_date, status } = req.body;
 
     try {
         // Check if the project exists
@@ -74,6 +74,7 @@ exports.update = async (req, res) => {
                 start_date: start_date || existingProject.start_date,
                 planned_end_date: planned_end_date || existingProject.planned_end_date,
                 actual_end_date: actual_end_date || existingProject.actual_end_date,
+                status: status || existingProject.status,
             },
         });
 
