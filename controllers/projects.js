@@ -4,12 +4,28 @@ const prisma = new PrismaClient()
 // Method to return all projects
 exports.getAll = async (req, res) => {
     try {
-        const response = await prisma.projects.findMany();
-        res.status(200).json(response)
+        const projects = await prisma.projects.findMany({
+            include: {
+                tasks: true,
+            },
+        });
+
+        const response = projects.map((project) => {
+            const totalTasks = project.tasks.length;
+            const completedTasks = project.tasks.filter(task => task.status === 'Completed').length;
+
+            return {
+                ...project,
+                totalTasks: totalTasks,
+                completedTasks: completedTasks,
+            };
+        });
+
+        res.status(200).json(response);
     } catch (error) {
-        res.status(500).json({ msg: error.message })
+        res.status(500).json({ msg: error.message });
     }
-}
+};
 
 // Method to return a project by its id
 exports.getById = async (req, res) => {
