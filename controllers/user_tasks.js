@@ -82,6 +82,41 @@ exports.getById = async (req, res) => {
     }
 }
 
+// Method to return a user_task assignment by its id
+exports.getById = async (req, res) => {
+    const id = parseInt(req.params.id);
+    try {
+        const response = await prisma.user_tasks.findUnique({
+            where: {
+                id: id,
+            },
+            include: {
+                users: true,
+            },
+        });
+
+        if (!response) {
+            return res.status(404).json({ msg: "User task not found" });
+        }
+
+        const result = {
+            id: response.id,
+            date: response.date,
+            location: response.location,
+            completion_rate: response.completion_rate,
+            time_spent: response.time_spent,
+            user_id: response.user_id,
+            project_id: response.project_id,
+            email: response.users.email,
+        };
+
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(404).json({ msg: error.message });
+    }
+};
+
+
 // Method to assign a user to a task
 exports.create = async (req, res) => {
     const { email, taskId } = req.body;
