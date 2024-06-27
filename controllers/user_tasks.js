@@ -15,6 +15,7 @@ exports.getTaskUsers = async (req, res) => {
                         name: true,
                         user_tasks: {
                             select: {
+                                id: true,
                                 date: true,
                                 location: true,
                                 completion_rate: true,
