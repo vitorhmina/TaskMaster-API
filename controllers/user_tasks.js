@@ -67,21 +67,6 @@ exports.getUserTasks = async (req, res) => {
     }
 };
 
-// Method to return a user_task assignement by its id
-exports.getById = async (req, res) => {
-    const id = parseInt(req.params.id);
-    try {
-        const response = await prisma.user_tasks.findUnique({
-            where: {
-                id: id,
-            },
-        })
-        res.status(200).json(response)
-    } catch (error) {
-        res.status(404).json({ msg: error.message })
-    }
-}
-
 // Method to return a user_task assignment by its id
 exports.getById = async (req, res) => {
     const id = parseInt(req.params.id);
@@ -106,7 +91,7 @@ exports.getById = async (req, res) => {
             completion_rate: response.completion_rate,
             time_spent: response.time_spent,
             user_id: response.user_id,
-            project_id: response.project_id,
+            task_id: response.task_id,
             email: response.users.email,
         };
 
