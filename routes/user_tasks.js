@@ -12,7 +12,7 @@ userTasksRouter.use(authMiddleware);
 userTasksRouter.get('/getTaskUsers/:id', controller.getTaskUsers); // get all users assigned to a task
 userTasksRouter.get('/getUserTasks', controller.getUserTasks); // get all tasks a user is assigned to
 userTasksRouter.get('/:id', controller.getById); // get a user assignement to a task by id
-userTasksRouter.post('/create', isManagerToProject , controller.create); // assign a user to a task
+userTasksRouter.post('/create', controller.create); // assign a user to a task
 userTasksRouter.put('/update/:id', isAssignedToTask, controller.update); // update a user task assignement
 userTasksRouter.delete('/delete/:id', isManagerToProject, controller.delete); // unassign a user from a task
 

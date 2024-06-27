@@ -12,19 +12,8 @@ exports.getTaskUsers = async (req, res) => {
             include: {
                 users: {
                     select: {
-                        id: true,
                         name: true,
-                        email: true,
-                        photo: true,
-                        user_types: {
-                            select: {
-                                user_type: true,
-                            }
-                        },
                         user_tasks: {
-                            where: {
-                                task_id: taskId
-                            },
                             select: {
                                 date: true,
                                 location: true,
@@ -37,8 +26,21 @@ exports.getTaskUsers = async (req, res) => {
             },
         });
 
-        const users = userTasks.map((userTask) => userTask.users);
-        res.status(200).json(users);
+        // Extract user_projects and include the associated user's name
+        const userTaskList = userTasks.flatMap((userTask) => {
+            const { users } = userTask;
+
+            return users.user_tasks.map((up) => ({
+                id: up.id,
+                date: up.date,
+                location: up.location,
+                completion_rate: up.completion_rate,
+                time_spent: up.time_spent,
+                name: users.name
+            }));
+        });
+
+        res.status(200).json(userTaskList);
     } catch (error) {
         res.status(404).json({ msg: error.message });
     }
